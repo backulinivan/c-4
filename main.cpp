@@ -21,9 +21,8 @@ struct hash_Set{
 //    TODO hash sets
 };
 
-bool compare_points(Point point1, Point point2){
-    if (point1.x == point2.x and point1.y == point2.y) return true;
-    else return false;
+bool compare_points(const Point &point1, const Point &point2){
+    return point1.x == point2.x and point1.y == point2.y;
 }
 
 Node *move_to_pos(List &list, int pos){
@@ -86,15 +85,28 @@ void delete_node(List &list, Node *node){
     list.length -= 1;
 }
 
-int search_node(List &list, Point s_point, bool dir = 1){
-    if (dir){
-        for (int pos = 0; pos < list.length; pos++)
-            if (compare_points(move_to_pos(list, pos)->point, s_point)) return pos;
-    }else {
-        for (int pos = list.length; pos > 0; pos--)
-            if (compare_points(move_to_pos(list, pos)->point, s_point)) return pos;
+Node* search_node(List &list, const Point &s_point, bool dir = true){
+    Node* ptr = dir ? list.head : list.tail;
+    while(ptr)
+    {
+        if (compare_points(ptr->point, s_point))
+            return ptr;
+        if (dir)
+            ptr = ptr->next;
+        else
+            ptr = ptr->prev;
     }
-    return 0;
+
+    return nullptr;
+
+//    if (dir){
+//        for (int pos = 0; pos < list.length; pos++)
+//            if (compare_points(move_to_pos(list, pos)->point, s_point)) return pos;
+//    }else {
+//        for (int pos = list.length; pos > 0; pos--)
+//            if (compare_points(move_to_pos(list, pos)->point, s_point)) return pos;
+//    }
+//    return 0;
 }
 
 //TODO function 6
