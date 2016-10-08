@@ -1,0 +1,11 @@
+struct hash_List{
+    List *keys[10];
+    hash_List(){
+        for(int i = 0; i<10; i++){
+            keys[i] = nullptr;
+        }
+    };
+    void add(Tuple &tuple){
+        add_to_list(*keys[tuple.key], tuple.value);
+    }
+};
