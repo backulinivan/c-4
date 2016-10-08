@@ -4,6 +4,13 @@ using namespace std;
 
 struct Point{
     int x, y;
+    void print_point(){
+        cout << "(" << x << ", " << y << ")" << endl;
+    }
+
+    bool compare_points(const Point &other){
+        return x == other.x and y == other.y;
+    }
 };
 
 struct Node{
@@ -12,129 +19,131 @@ struct Node{
 };
 
 struct List{
-    Node *head = nullptr;
-    Node *tail = nullptr;
-    int length = 0;
+
+    Node *beginning;
+    Node *end;
+    int length;
+
+    List(){
+        beginning = end = nullptr;
+        length = 0;
+    }
+
+    void add_node(Point &point, Node *node){
+        Node *add = new Node;
+        add->point = point;
+        if (beginning != nullptr) {
+            if (node == nullptr) {
+                cerr << "Invalid node!";
+                exit(1);
+            } else {
+                add->prev = node;
+                node->next = add;
+                if (node == end){
+                    add->next = nullptr;
+                    end = add;
+                } else {
+                    add->next = node->next;
+                    node->next->prev = add;
+                }
+            }
+        } else {
+            add->prev = nullptr;
+            beginning = end = add;
+        }
+        length += 1;
+    }
+
+    void delete_node(Node *node){
+        if (node != beginning and node != end) {
+            node->next->prev = node->prev;
+            node->prev->next = node->next;
+            delete node;
+        } else if (node == end){
+            end = node->prev;
+            *node = nullptr;
+        } else if (node == beginning){
+            beginning = node->next;
+            *node = nullptr;
+        } else{
+            cerr << "Invalid node!";
+            exit(1);
+        }
+        length -= 1;
+    }
+
+    Node* search_node(const Point &s_point, bool dir = true) {
+        Node *ptr = dir ? beginning : end;
+        while (ptr) {
+            if (ptr->point.compare_points(s_point))
+                return ptr;
+            if (dir)
+                ptr = ptr->next;
+            else
+                ptr = ptr->prev;
+        }
+        return nullptr;
+    }
+
+    void print_list(){
+        Node *temp = beginning;
+        while(temp != nullptr){
+            temp->point.print_point();
+            temp = temp->next;
+        }
+    }
 };
 
-struct hash_Set{
-//    TODO hash sets
+struct Tuple{
+    int key;
+    Node *value;
+    Tuple(int _key, Node *_value){
+        key = _key;
+        value = _value;
+    }
 };
 
-bool compare_points(const Point &point1, const Point &point2){
-    return point1.x == point2.x and point1.y == point2.y;
+int hash(Point &point){
+    return (point.x+point.y)%10;
 }
 
-Node *move_to_pos(List &list, int pos){
-    Node *node = list.head;
-    if (pos == 0) return node;
-    for (int i=0; i < pos; i++){
-        if (node != list.tail)
-            node = node->next;
-        else return node;
-    }
-    return node;
-}
+class hash_List{
+    List *keys[10];
+    void add(const Tuple &pair){
 
-void add_to_list(List &list, Point &point){
-    Node *temp = new Node;
-    temp->next = nullptr;
-    temp->point = point;
-    if (list.head != nullptr){
-        temp->prev = list.tail;
-        list.tail->next = temp;
-        list.tail = temp;
     }
-    else{
-        temp->prev = nullptr;
-        list.head = list.tail = temp;
-    }
-    list.length += 1;
-}
+};
 
-void add_node_before(List &list, Point &point, Node *node){
-    Node *add = new Node;
-    add->point = point;
-    add->next = node;
-    if (node == list.head){
-        list.head = add;
-        add->prev = nullptr;
-    }else if (node == nullptr){
-        cerr << "Invalid node!";
-        exit(1);
-    } else{
-        add->prev = node->prev;
-        node->prev->next = add;
-        node->prev = add;
-    }
-    list.length += 1;
-}
-
-void delete_node(List &list, Node *node){
-    if (node != list.head and node != list.tail) {
+/*void delete_node(List &list, Node *node){
+    if (node != list.beginning and node != list.end) {
         node->next->prev = node->prev;
         node->prev->next = node->next;
-    } else if (node == list.tail){
-        list.tail = node->prev;
-    } else if (node == list.head){
-        list.head = node->next;
+        delete node;
+    } else if (node == list.end){
+        list.end = node->prev;
+        *node = nullptr;
+    } else if (node == list.beginning){
+        list.beginning = node->next;
+        *node = nullptr;
     } else{
         cerr << "Invalid node!";
         exit(1);
     }
     list.length -= 1;
-}
-
-Node* search_node(List &list, const Point &s_point, bool dir = true){
-    Node* ptr = dir ? list.head : list.tail;
-    while(ptr)
-    {
-        if (compare_points(ptr->point, s_point))
-            return ptr;
-        if (dir)
-            ptr = ptr->next;
-        else
-            ptr = ptr->prev;
-    }
-
-    return nullptr;
-
-//    if (dir){
-//        for (int pos = 0; pos < list.length; pos++)
-//            if (compare_points(move_to_pos(list, pos)->point, s_point)) return pos;
-//    }else {
-//        for (int pos = list.length; pos > 0; pos--)
-//            if (compare_points(move_to_pos(list, pos)->point, s_point)) return pos;
-//    }
-//    return 0;
-}
-
-//TODO function 6
-
-void print_point(Point &point){
-    cout << "(" << point.x << ", " << point.y << ")" << endl;
-}
-
-void print_list(List &list){
-    Node *temp = list.head;
-    while(temp != nullptr){
-        print_point(temp->point);
-        temp = temp->next;
-    }
-}
+}*/
 
 int main() {
-    List list;
+    List new_list;
     Point add = {7, 5};
     for (int i=0; i<6; i++){
         Point a = {rand()%10, rand()%10};
-        add_to_list(list, a);
+        new_list.add_node(a, new_list.end);
     }
-    print_list(list);
+    new_list.print_list();
     cout << endl;
-    add_node_before(list, add, move_to_pos(list, 3));
-    print_list(list);
-    cout << search_node(list, {7, 5}, 0);
+    //add_node(list, add, move_to_pos(list, 3));
+    //print_list(list);
+    //cout << search_node(list, {7, 5}, 0);
     //add_node_before(list, add, list.tail);
     //delete_node(list, list.head->next);
     //print_list(list);
